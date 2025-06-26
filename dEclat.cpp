@@ -5,7 +5,7 @@ using namespace std;
 struct node{
     vector<int> item;
     vector<int> diff;
-    double sp;
+    int sp;
 };
 vector<node> fri_item;
 map< vector<int> , int > con;
@@ -20,7 +20,7 @@ void print_confidence(vector<int> a_b, int  b, double sp){
 cout << '\n';
 }
 
-void print(vector<node> items,int n) {
+void print(vector<node> items) {
     cout << "the size of the friquent item is " << items[0].item.size() << '\n' ;
     for (auto x : items) {
         cout << "{ ";
@@ -29,7 +29,7 @@ void print(vector<node> items,int n) {
             if (i < x.item.size()-1)
                 cout << ", ";
         }
-        cout << " }  support = "  << x.sp/n << "\n";
+        cout << " }  support = "  << x.sp << "\n";
     }
 }
 map<vector<int>, vector<int>> build(vector<vector<int> > transaction){
@@ -66,7 +66,7 @@ vector<node> build_1( map<vector<int>, vector<int> > tran,int n){
         fri_item.push_back(tmp);
         con[tmp.item] = tmp.sp;
     }
-    print(rs,n);
+    print(rs);
     return rs;
 }
 
@@ -115,14 +115,14 @@ void DiffEclat(vector<node> lk, int MinSp, int n){
             tmp.diff = find_diff(lk[i].diff, lk[j].diff);
             tmp.sp = lk[i].sp - tmp.diff.size();
             con[tmp.item] = tmp.sp;
-            if (tmp.sp/n >= MinSp ) {
+            if (tmp.sp >=MinSp ) {
                 n_lk.push_back(tmp);
                 fri_item.push_back(tmp);
                 f=0;
             }
         }
     }
-    if(!f)print(n_lk,n);
+    if(!f)print(n_lk);
     DiffEclat(n_lk,MinSp,n);
 }
 double cal_confidence(vector<int> a_b, int b,int n){
@@ -173,7 +173,7 @@ int main() {
     double MinSp;
     cin >> MinSp;
 
-    DiffEclat(  build_1( build(transaction),n) , MinSp, n);
+    DiffEclat(  build_1( build(transaction),n) , MinSp*n, n);
     confidence(MinSp,n);
 
 
