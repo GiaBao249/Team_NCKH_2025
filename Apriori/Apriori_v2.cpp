@@ -13,7 +13,7 @@ int n, min_sup, k = 0; // So dong, min_support, do dai item hien tai cua frequen
 vector<set<string>>transactions; // Danh sach tat ca giao dich
 vector<item_name>frequent; // Danh sach tap muc thuong xuyen
 vector<item_name>candidate; // Danh sach tap muc thanh vien (Candidate)
-map<item_name, int> mp_item; // Danh sach tap muc da chuyen doi sang dang hang ngang
+map<item_name, int> mp_item; // Dung de tinh support
 
 // Ham nay de hien thi ten cua item
 string get_item_name(item_name name){
