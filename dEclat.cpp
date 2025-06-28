@@ -1,25 +1,28 @@
 #include<bits/stdc++.h>
-#include <chrono>
 using namespace std;
-
+// the friquent item data
 struct node{
     vector<int> item;
     vector<int> diff;
     int sp;
 };
+
 vector<node> fri_item;
-map< vector<int> , int > con;
+map< vector<int> , int > con; // save friquent items to calculate confidence
+
+// print confidence
 void print_confidence(vector<int> a_b, int  b, double sp){
     cout<<"{ ";
-    for(int i=0;i<a_b.size();++i){
-        if(a_b[i] != b){
+
+    for(int i=0;i<a_b.size();++i)
+        if(a_b[i] != b)
             cout<<a_b[i]<<"  ";
-        }
-    }
+
     cout << "}   ---> " << b << "     Confidence : "<<sp;
 cout << '\n';
 }
 
+// print friquent item
 void print(vector<node> items) {
     cout << "the size of the friquent item is " << items[0].item.size() << '\n' ;
     for (auto x : items) {
@@ -32,6 +35,8 @@ void print(vector<node> items) {
         cout << " }  support = "  << x.sp << "\n";
     }
 }
+
+// build the vertical transactions
 map<vector<int>, vector<int>> build(vector<vector<int> > transaction){
     map<vector<int>, vector<int> > rs;
     for(int i=0;i<transaction.size();++i){
@@ -41,6 +46,8 @@ map<vector<int>, vector<int>> build(vector<vector<int> > transaction){
     }
 return rs;
 }
+
+// calculating diffset of friquent 1-items
 vector<int> cal_diff_1(vector<int> a, int n){
         vector<int> rs;
         map<int,int> tmp;
@@ -55,6 +62,7 @@ vector<int> cal_diff_1(vector<int> a, int n){
         return rs;
 }
 
+// build the friquent 1-item
 vector<node> build_1( map<vector<int>, vector<int> > tran,int n){
     vector<node> rs;
     for(auto i:tran){
@@ -70,6 +78,7 @@ vector<node> build_1( map<vector<int>, vector<int> > tran,int n){
     return rs;
 }
 
+// build the friquent (k+1)-item from two friquent k-items
 vector<int> find_diff(vector<int> a, vector<int> b){
 
     vector<int> rs;
@@ -83,6 +92,8 @@ vector<int> find_diff(vector<int> a, vector<int> b){
 
     return rs;
 }
+
+// creating a item from two items
 vector<int> merge_item(vector<int> a, vector<int> b){
     vector<int> rs;
     map<int,int> tmp;
@@ -91,40 +102,52 @@ vector<int> merge_item(vector<int> a, vector<int> b){
 
     for(int i=0;i<b.size()-1;++i){
             if(a[i] != b[i])return rs;
+            // if the first k-1 elements of  A are not the same as the first k-1 elements of B, return a empty vector
     }
     if(a[a.size()-1] < b[b.size()-1]){
         a.push_back(b[b.size()-1]);
+        // if the k element of both A and B are not the same. add it to A
     }
 
     return a;
 
 }
 
+// the main function of dEclat algorithm
 void DiffEclat(vector<node> lk, int MinSp, int n){
 
-    if(lk.empty())return ;
-    vector<node> n_lk;
+    if(lk.empty())return ;  // if the friquent k-item is empty, the function will stop
+    vector<node> n_lk;// the friquent (k+1)-item
     map<vector<int> , int > cnt;
     bool f=1;
-    for (int i=0;i<lk.size()-1;++i){
+
+    // build the friquent (k+1)-item
+    for (int i=0;i<lk.size()-1;++i)
         for (int j=i+1;j<lk.size();++j){
+
             node tmp;
             tmp.item = merge_item(lk[i].item, lk[j].item);
+
             if(tmp.item.size() == 0 || cnt[tmp.item])continue;
             cnt[tmp.item]=1;
+
             tmp.diff = find_diff(lk[i].diff, lk[j].diff);
             tmp.sp = lk[i].sp - tmp.diff.size();
             con[tmp.item] = tmp.sp;
+
             if (tmp.sp >=MinSp ) {
                 n_lk.push_back(tmp);
                 fri_item.push_back(tmp);
                 f=0;
             }
+
         }
-    }
+
     if(!f)print(n_lk);
     DiffEclat(n_lk,MinSp,n);
 }
+
+
 double cal_confidence(vector<int> a_b, int b,int n){
     if(a_b.size() <= 1)return 0;
     vector<int> a;
@@ -168,6 +191,7 @@ int main() {
             cin >> tmp;
             transaction[i].push_back(tmp);
         }
+        sort(transaction[i].begin(), transaction[i].end());
     }
     cout << "nhap min Support: ";
     double MinSp;
