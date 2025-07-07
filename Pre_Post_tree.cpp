@@ -188,7 +188,7 @@ int main(){
             cin >> transaction[i][j];
     }
 
-    cout << "Enter minimum support: ";
+    cout << "nhap min support: ";
     cin >> min_sp;
 
     vector<int> order=pre_build_tree(transaction);
@@ -200,6 +200,7 @@ int main(){
 }
 
 /*
+test case 1:
 6
 4
 1 2 4 5
@@ -213,8 +214,9 @@ int main(){
 1 2 3 4 5
 3
 2 3 4
-3
 
+
+test case 2:
 10
 3
 1 2 3
