@@ -9,18 +9,6 @@ struct node{
 };
 
 vector<node> fri_item;
-map< vector<int> , double > con; // save friquent items to calculate confidence
-
-// print confidence
-void print_confidence(vector<int> a_b, int  b, double sp){
-    cout<<"{ ";
-
-    for(int i=0;i<a_b.size();++i)
-        if(a_b[i] != b) cout<<a_b[i]<<"  ";
-
-    cout << "}   ---> " << b << "     Confidence : "<<sp;
-cout << '\n';
-}
 
 // print friquent item
 void print(vector<node> items) {
@@ -58,7 +46,7 @@ vector<node> build_1( map< int, vector<int> > tran, int n, double MinSp){
             rs.push_back(tmp);
             fri_item.push_back(tmp);
         }
-        con[tmp.item] = tmp.sp;
+
     }
     print(rs);
     return rs;
@@ -82,9 +70,8 @@ vector<int> cal_tid(vector<int> a, vector<int> b){
 // creating a item from two items.
 vector<int> merge_item(vector<int> a, vector<int> b){
     vector<int> rs;
-    map<int,int> tmp;
+
     int cnt =0;
-    for(auto i:a)++tmp[i];
 
     for(int i=0;i<b.size()-1;++i){
             if(a[i] != b[i])return rs;
@@ -121,7 +108,6 @@ void Eclat(vector<node> lk, double MinSp, int n){
 
             tmp.tid = cal_tid( lk[i].tid, lk[j].tid );
             tmp.sp = (double) tmp.tid.size()/n;
-            con[tmp.item] = tmp.tid.size();
 
             if (tmp.sp >=MinSp ) {
                 n_lk.push_back(tmp);
@@ -134,36 +120,6 @@ void Eclat(vector<node> lk, double MinSp, int n){
 
     if(!f)print(n_lk);
     Eclat(n_lk,MinSp,n);
-}
-
-// calculating the confidence
-double cal_confidence(vector<int> a_b, int b,int n){
-    if(a_b.size() <= 1)return 0;
-    vector<int> a;
-    for(auto i:a_b)
-        if(i != b){
-            a.push_back(i);
-        }
-
-    double sp_a_b = (double)con[a_b]/n;
-    double sp_a = (double)con[a]/n;
-    if(!sp_a)return 0;
-    return (double) sp_a_b/sp_a;
-}
-
-// the main function of confidence
-void confidence( double MinSupport,int n){
-
-    for(auto i:con){
-        if(i.first.size() == 1)continue;
-        for(auto j:i.first){
-
-            double  tmp = cal_confidence(i.first, j,n);
-            if(tmp >= MinSupport){
-                    print_confidence(i.first, j, tmp);
-            }
-        }
-    }
 }
 
 int main() {
@@ -187,8 +143,6 @@ int main() {
     cin >> MinSp;
 
     Eclat(  build_1( build( transaction), n, MinSp ) , MinSp, n );
-    confidence(MinSp,n);
-
 
     return 0;
 }

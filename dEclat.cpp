@@ -72,7 +72,7 @@ vector<node> build_1( map<vector<int>, vector<int> > tran,int n){
         tmp.diff = cal_diff_1(i.second,n);
         rs.push_back(tmp);
         fri_item.push_back(tmp);
-        con[tmp.item] = tmp.sp;
+
     }
     print(rs);
     return rs;
@@ -133,7 +133,7 @@ void DiffEclat(vector<node> lk, int MinSp, int n){
 
             tmp.diff = find_diff(lk[i].diff, lk[j].diff);
             tmp.sp = lk[i].sp - tmp.diff.size();
-            con[tmp.item] = tmp.sp;
+
 
             if (tmp.sp >=MinSp ) {
                 n_lk.push_back(tmp);
@@ -148,33 +148,7 @@ void DiffEclat(vector<node> lk, int MinSp, int n){
 }
 
 
-double cal_confidence(vector<int> a_b, int b,int n){
-    if(a_b.size() <= 1)return 0;
-    vector<int> a;
-    for(auto i:a_b)
-        if(i != b){
-            a.push_back(i);
-        }
 
-    double sp_a_b = (double)con[a_b]/n;
-    double sp_a = (double)con[a]/n;
-    if(!sp_a)return 0;
-    return (double) sp_a_b/sp_a;
-}
-void confidence( double MinSupport,int n){
-
-    for(auto i:con){
-        if(i.first.size() == 1)continue;
-        for(auto j:i.first){
-
-            double  tmp = cal_confidence(i.first, j,n);
-            if(tmp >= MinSupport){
-                    print_confidence(i.first, j, tmp);
-            }
-        }
-    }
-
-}
 
 int main() {
     int n;
@@ -198,7 +172,7 @@ int main() {
     cin >> MinSp;
 
     DiffEclat(  build_1( build(transaction),n) , MinSp*n, n);
-    confidence(MinSp,n);
+
 
 
     return 0;
@@ -218,7 +192,7 @@ int main() {
 1 2 3 4 5
 3
 2 3 4
-0.5
+2
 
 
 */
