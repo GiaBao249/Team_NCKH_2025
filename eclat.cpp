@@ -2,132 +2,109 @@
 #include <bits/stdc++.h>
 #define el cout << '\n'
 #define tm_opt ios_base::sync_with_stdio(0); cin.tie(0); cout.tie(0)
-#define f0(i,n) for(int i=0; i<n; i++)
-#define f1(i,n) for(int i=1; i<=n; i++)
+#define f0(i,n) for(ll i=0; i<n; i++)
+#define f1(i,n) for(ll i=1; i<=n; i++)
 #define pb push_back
 #define all(a) a.begin(),a.end()
 using namespace std;
-using us_name = vector<string>;
-using us_tids = vector<int>;
+using namespace std::chrono;
 
 struct item{
-    us_name name;
-    us_tids tids;
+    vector<int>itemset;
+    vector<int>tid;
 
     item(){}
-    item(us_name name, us_tids tids){
-        this->name = name;
-        this->tids = tids;
-    }
-
-    void print(){
-        string str = "{";
-        int n = name.size();
-        if(n>0){
-            for(string x: name) str += x + ",";
-            str.pop_back();
-        }
-        str += "}";
-        cout << str << " => ";
-        for(int x: tids) cout << x << ' ';
-        el;
+    item(int id, vector<int> tid){
+        itemset.pb(id);
+        this->tid = tid;
     }
 };
 
-int n, min_sup; // So dong, min_support
-vector<vector<string>>transactions; // Danh sach tat ca giao dich
-vector<item>frequent; // Danh sach tap muc thuong xuyen
-map<us_name, us_tids> mp_item; // Danh sach tap muc da chuyen doi sang dang hang ngang
-vector<item> vt_item; // Danh sach tap muc da chuyen doi tu mp_item -> vt_item
+int minsup, n;
+float min_sup = 0.9;
 
-void doc(){
-    cin >> n >> min_sup; cin.ignore(); // Doc n va min_sup
-    f0(i,n){ // Doc tat ca giao dich trong file
-        string str; getline(cin, str);
-        stringstream ss(str);
-        string s;
+vector<vector<int>>transactions;
+map<int,vector<int>>mp_1_itemset;
+vector<item>freq, L;
 
-        vector<string>transaction;
-        while(getline(ss,s,',')) if(s!=""){
-            transaction.pb(s);
+void read_database(){
+    string str;
+    while(getline(cin, str)){
+        n++;
+        vector<int>tr;
+        int num = 0;
+        for(char c: str)
+            if('0' <= c && c <= '9') num = num * 10 + (c - '0');
+            else if(num>0){
+                tr.pb(num);
+                mp_1_itemset[num].pb(n);
+                num = 0;
+            }
+        if(num>0) {
+            tr.pb(num);
+            mp_1_itemset[num].pb(n);
         }
-        transactions.pb(transaction);
+        transactions.pb(tr);
     }
-
-    // Chuyen doi transaction sang mp_item
-    f0(i,int(transactions.size())) {
-        for(string x: transactions[i]){
-            mp_item[us_name{x}].pb(i);
-        }
-    }
-
-    // Chuyen doi tu mp_item -> vt_item
-    for(auto x: mp_item){
-        us_name name = x.first;
-        us_tids tids = x.second;
-        vt_item.pb(item(name, tids));
-    }
+    minsup = min_sup * n;
 }
 
-// Tim tap giao
-us_tids intersect(vector<int>a, vector<int>b){
-    vector<int>res;
-    int m = a.size(), n = b.size(), i = 0, j = 0;
+item intersection(const item &a, const item &b){
+    item c;
+    c.itemset = a.itemset;
+    c.itemset.pb(b.itemset[b.itemset.size()-1]);
+
+    int i=0, j=0, m=a.tid.size(), n=b.tid.size();
     while(i<m && j<n){
-        if(a[i]==b[j]) {
-            res.pb(a[i]);
+        if(a.tid[i] == b.tid[j]){
+            c.tid.pb(a.tid[i]);
             i++;
             j++;
         }
-        else if(a[i]<b[j]) i++;
+        else if (a.tid[i] < b.tid[j]) i++;
         else j++;
     }
-    return res;
+
+    return c;
 }
 
-
-void eclat_recursive(const us_name &prefix, const vector<item> &items){
-    int n = items.size();
+void eclat(vector<item>L){
+    int n = L.size();
     for(int i=0; i<n; i++){
-        us_name new_prefix = prefix;
-        new_prefix.pb(items[i].name[0]);
-
-        us_tids tid_list = items[i].tids;
-        if(int(tid_list.size())>=min_sup){
-            frequent.pb({new_prefix, tid_list});
-
-            vector<item> new_items;
-            for(int j=i+1; j<n; j++){
-                us_name new_name = items[j].name;
-                us_tids new_tids = intersect(tid_list, items[j].tids);
-                if(int(new_tids.size())>=min_sup) new_items.pb(item(new_name, new_tids));
-            }
-
-            eclat_recursive(new_prefix, new_items);
+        freq.pb(L[i]);
+        vector<item>new_L;
+        for(int j=i+1; j<n; j++){
+            item it = intersection(L[i], L[j]);
+            if(it.tid.size()>=minsup) new_L.pb(it);
         }
+        eclat(new_L);
     }
 }
 
-void eclat(){
-    us_name prefix;
-    eclat_recursive(prefix, vt_item);
-}
+void solve(){
+    // Find L1
+    for(auto [u, v]: mp_1_itemset)
+        if(v.size() >= minsup)
+            L.pb(item(u, v));
 
-void print_result(){
-    cout << "Danh sach tap muc thuong xuyen: ", el;
-    for(item x: frequent) x.print();
+    // Find Lk
+    eclat(L);
 }
 
 signed main(){
     tm_opt;
     #ifdef demo
-    freopen("sinh.inp", "r", stdin);
+    freopen("chess.txt", "r", stdin);
     freopen("code.ans", "w", stdout);
     #endif // demo
 
-    doc();
-    eclat();
-    print_result();
-
-    return 0;
+    auto start = high_resolution_clock::now();
+    read_database();
+    solve();
+    auto stop = high_resolution_clock::now();
+    auto duration = duration_cast<milliseconds>(stop - start);
+    cout << freq.size(), el;
+    cout << duration.count() << " ms" , el;
 }
+
+
