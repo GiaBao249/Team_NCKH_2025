@@ -63,7 +63,7 @@ struct Node{
 
 int n, idPre, idPost; // So giao dich trong csdl, nguong toi thieu, Pre, Post
 float minsup;
-float min_sup = 0.2; // Nguong toi thieu voi 0<x<1
+float min_sup = 0.5; // Nguong toi thieu voi 0<x<1
 float sum_ts = 0.0;
 vector<vector<int>>transactions; // Danh sach cac giao dich
 Node *root = new Node();
@@ -73,6 +73,7 @@ unordered_map<int,WNList>mp_nlists;
 vector<WNList>F1, F2; // Tap muc thuong xuyen cap i
 vector<WNList>freq;
 
+// Bo bien de sinh
 vector<int>vt_sinh;
 vector<vector<int>>vt_sinh_list;
 int n_sinh;
@@ -145,6 +146,8 @@ WNList intersection(const WNList &a, const WNList &b){
     return c;
 }
 
+static int eclat_depth = 0;
+
 void eclat(vector<WNList>vt_nlists, WNList nl_check){
     int n = vt_nlists.size();
     for(int i=0; i<n; i++) {
@@ -171,9 +174,11 @@ void eclat(vector<WNList>vt_nlists, WNList nl_check){
                 new_vt_nlists.pb(P);
             }
         }
-        if(equivalent_item.size()) {
+        eclat_depth++;
+        eclat(new_vt_nlists, nl_equivalent_item);
+        eclat_depth--;
+        if(equivalent_item.size())
             Sinh_Tap(vt_nlists[i].items, equivalent_item, nl_equivalent_item.weight);
-        }
     }
 }
 
@@ -183,17 +188,18 @@ void calculate_sup_1_item(){
             sup_1_itemset[x] += w_ts[ts+1]/sum_ts;
         }
     }
+
     vector<pair<int,float>> supv(sup_1_itemset.begin(), sup_1_itemset.end());
     sort(supv.begin(), supv.end(), [](auto &L, auto &R){
         if(L.second!=R.second) return L.second>R.second;
         return L.first<R.first;
     });
-
 }
 
 void doc(){
     string str, s; // Chuoi mot dong, chuoi tung item
     int tid=1;
+
     while(getline(cin, str)){
         if(str.size()==0) continue;
         stringstream ss(str);
@@ -211,7 +217,6 @@ void doc(){
         n++;
     }
     minsup = min_sup;
-
     calculate_sup_1_item();
     // Loc va sap xep lai cac giao dich
     for(auto &transaction: transactions){
@@ -265,6 +270,7 @@ void build_1_itemset(){
     for(auto &[u,v]: mp_nlists) {
         F1.pb(v);
     }
+
 }
 
 void solve(){
@@ -282,7 +288,7 @@ void solve(){
 signed main(){
     tm_opt;
     #ifdef demo
-    freopen("C:\\Users\\Acer\\.templateengine\\Research_science\\test.txt", "r", stdin);
+    freopen("C:\\Users\\Acer\\.templateengine\\Research_science\\test2.txt", "r", stdin);
 //  freopen("code.ans", "w", stdout);
     #endif // demo
 
@@ -295,7 +301,6 @@ signed main(){
     auto stop = high_resolution_clock::now();
     auto duration = duration_cast<milliseconds>(stop - start);
 
-    // Kết quả chuẩn
     cout << freq.size(), el;
     cout << duration.count() << " ms" , el;
 
