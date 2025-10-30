@@ -174,9 +174,9 @@ void eclat(vector<WNList>vt_nlists, WNList nl_check){
                 new_vt_nlists.pb(P);
             }
         }
-        eclat_depth++;
+
         eclat(new_vt_nlists, nl_equivalent_item);
-        eclat_depth--;
+
         if(equivalent_item.size())
             Sinh_Tap(vt_nlists[i].items, equivalent_item, nl_equivalent_item.weight);
     }
@@ -288,7 +288,7 @@ void solve(){
 signed main(){
     tm_opt;
     #ifdef demo
-    freopen("C:\\Users\\Acer\\.templateengine\\Research_science\\test.txt", "r", stdin);
+    freopen("C:\\Users\\Acer\\.templateengine\\Research_science\\test2.txt", "r", stdin);
 //  freopen("code.ans", "w", stdout);
     #endif // demo
 
