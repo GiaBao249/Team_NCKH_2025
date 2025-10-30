@@ -146,7 +146,7 @@ WNList intersection(const WNList &a, const WNList &b){
     return c;
 }
 
-static int eclat_depth = 0;
+int eclat_depth = 0;
 
 void eclat(vector<WNList>vt_nlists, WNList nl_check){
     int n = vt_nlists.size();
@@ -288,7 +288,7 @@ void solve(){
 signed main(){
     tm_opt;
     #ifdef demo
-    freopen("C:\\Users\\Acer\\.templateengine\\Research_science\\test2.txt", "r", stdin);
+    freopen("C:\\Users\\Acer\\.templateengine\\Research_science\\test.txt", "r", stdin);
 //  freopen("code.ans", "w", stdout);
     #endif // demo
 
